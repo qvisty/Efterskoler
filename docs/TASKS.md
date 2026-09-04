@@ -66,14 +66,16 @@ Mål: alle ordblindeefterskoler på et Danmarkskort, hver skole kan slås til og
 
 ## Task 004: GitHub Pages hosting
 
-**Status:** TODO
+**Status:** DONE
 
 **Formål:** Gøre kortet delbart som link.
 
 **Acceptkriterier:**
 
-- [ ] sitet er tilgængeligt på en offentlig URL
-- [ ] README opdateret med linket
+- [x] sitet er tilgængeligt på en offentlig URL
+- [x] README opdateret med linket
+
+**Resultat:** Deploy workflow i `.github/workflows/pages.yml`, hvert push til main deployer automatisk. Sitet ligger på https://qvisty.github.io/Efterskoler/. Pages blev aktiveret manuelt i repo settings, da workflow tokenet ikke må oprette Pages sitet.
 
 ## Opdagede tasks
 
