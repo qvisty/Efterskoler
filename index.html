@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ordblindeefterskoler i Danmark</title>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <style>
+    :root {
+      --accent: #d9480f;
+      --school: #1b4f9c;
+      --text: #1f2430;
+      --panel-bg: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+    }
+
+    #map {
+      position: absolute;
+      inset: 0;
+    }
+
+    #panel {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 1000;
+      width: 320px;
+      max-height: calc(100% - 24px);
+      display: flex;
+      flex-direction: column;
+      background: var(--panel-bg);
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+    }
+
+    #panel header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid #e3e6ea;
+    }
+
+    #panel h1 {
+      margin: 0 0 4px;
+      font-size: 1.05rem;
+      line-height: 1.3;
+    }
+
+    #panel p.intro {
+      margin: 0;
+      font-size: 0.82rem;
+      color: #5a6270;
+      line-height: 1.45;
+    }
+
+    #controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-bottom: 1px solid #e3e6ea;
+      font-size: 0.82rem;
+    }
+
+    #controls button {
+      border: 1px solid #c6ccd4;
+      background: #f4f6f8;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    #controls button:hover { background: #e8ebef; }
+
+    #count {
+      margin-left: auto;
+      color: #5a6270;
+      white-space: nowrap;
+    }
+
+    #school-list {
+      overflow-y: auto;
+      padding: 6px 8px 12px;
+      flex: 1;
+    }
+
+    .region-title {
+      margin: 10px 8px 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #7a8290;
+    }
+
+    .school {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      line-height: 1.3;
+    }
+
+    .school:hover { background: #f1f4f7; }
+
+    .school input {
+      accent-color: var(--school);
+      width: 15px;
+      height: 15px;
+      flex: none;
+      cursor: pointer;
+    }
+
+    .school .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--school);
+      flex: none;
+    }
+
+    .school .town {
+      display: block;
+      font-size: 0.74rem;
+      color: #7a8290;
+    }
+
+    .school.off { opacity: 0.45; }
+
+    .school.highlight { font-weight: 600; }
+    .school.highlight .dot { background: var(--accent); }
+    .school.highlight input { accent-color: var(--accent); }
+
+    #toggle-panel {
+      display: none;
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 1100;
+      border: none;
+      background: var(--panel-bg);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .leaflet-popup-content { font-size: 0.9rem; line-height: 1.4; }
+    .leaflet-popup-content .popup-town { color: #5a6270; font-size: 0.8rem; }
+    .leaflet-popup-content a { color: var(--school); }
+
+    @media (max-width: 640px) {
+      #toggle-panel { display: block; }
+
+      #panel {
+        top: 56px;
+        width: calc(100% - 24px);
+        max-height: 55%;
+      }
+
+      #panel.hidden { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <button id="toggle-panel" type="button">Skoleliste</button>
+
+  <aside id="panel">
+    <header>
+      <h1>Ordblindeefterskoler i Danmark</h1>
+      <p class="intro">
+        Slå de enkelte skoler til og fra og se, hvad der sker med dækningen.
+        Prøv at fjerne <strong>Emmerske Efterskole</strong> og se hullet i Sydvestdanmark.
+      </p>
+    </header>
+    <div id="controls">
+      <button id="select-all" type="button">Vælg alle</button>
+      <button id="select-none" type="button">Fravælg alle</button>
+      <span id="count"></span>
+    </div>
+    <div id="school-list"></div>
+  </aside>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="data/schools.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
