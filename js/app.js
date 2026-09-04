@@ -1,7 +1,7 @@
 /* Kort og togglepanel for ordblindeefterskolerne. Data kommer fra
    data/schools.js som definerer SCHOOLS. */
 
-const REGION_ORDER = ["Nordjylland", "Midtjylland", "Syddanmark", "Fyn", "Sjælland"];
+const REGION_ORDER = ["Nordjylland", "Midtjylland", "Syddanmark", "Fyn og øerne", "Sjælland"];
 
 const map = L.map("map", { zoomControl: false });
 L.control.zoom({ position: "bottomright" }).addTo(map);
@@ -34,14 +34,10 @@ function markerStyle(school) {
 }
 
 function popupHtml(school) {
-  const note = school.verified === false
-    ? '<div class="popup-town">Oplysninger under verifikation</div>'
-    : "";
   return (
     `<strong>${school.name}</strong>` +
     `<div class="popup-town">${school.town}</div>` +
-    `<a href="${school.website}" target="_blank" rel="noopener">${school.website.replace(/^https?:\/\//, "")}</a>` +
-    note
+    `<a href="${school.website}" target="_blank" rel="noopener">${school.website.replace(/^https?:\/\//, "")}</a>`
   );
 }
 

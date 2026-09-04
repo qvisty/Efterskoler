@@ -48,11 +48,13 @@ website     skolens hjemmeside
 highlight   true for Emmerske Efterskole
 ```
 
+Derudover indeholder `data/grid.js` de genererede gitterpunkter til afstandslaget, se `docs/ARCHITECTURE.md`.
+
 ## Datakvalitet
 
-- Kilden er foreningen Ordblindeefterskolerne, ordbl.dk, som har 20 medlemsskoler, suppleret med søgeresultater, da direkte opslag ikke var muligt fra udviklingsmiljøet
-- Koordinater er sat ud fra skolernes by og område, ikke ud fra opslag på den præcise adresse. Præcisionen er typisk inden for 1 til 2 km, hvilket er nok til et Danmarkskort, men de skal verificeres, se task i `docs/TASKS.md`
-- Skrødstrup Efterskoles medlemskab af foreningen skal verificeres, skolen er markeret med `verified: false` i datasættet
+- Skoleliste og koordinater er leveret af projektejeren 2026-09-04 og gælder som autoritativ kilde, se Task 003 i `docs/TASKS.md`
+- Koordinaterne er på adresseniveau
+- Hjemmesider er slået op på skolernes egne sider
 
 ## Persondata
 

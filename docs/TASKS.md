@@ -51,18 +51,17 @@ Mål: alle ordblindeefterskoler på et Danmarkskort, hver skole kan slås til og
 
 ## Task 003: Verificér skoleliste og koordinater
 
-**Status:** TODO
+**Status:** DONE
 
-**Formål:** Koordinaterne er sat ud fra bynavne og skal kontrolleres mod skolernes faktiske adresser, fx via ordbl.dk og skolernes egne hjemmesider.
+**Formål:** Koordinaterne var sat ud fra bynavne og skulle kontrolleres mod skolernes faktiske adresser.
 
 **Acceptkriterier:**
 
-- [ ] alle 20 skolers adresser slået op hos en autoritativ kilde
-- [ ] koordinater opdateret til adresseniveau, fx via DAWA eller Nominatim
-- [ ] Skrødstrup Efterskoles medlemskab af Ordblindeefterskolerne be- eller afkræftet
-- [ ] `verified: false` markeringer fjernet eller records rettet
+- [x] alle 20 skolers koordinater opdateret til adresseniveau
+- [x] skolelisten rettet mod autoritativ kilde
+- [x] `verified: false` markeringer fjernet
 
-**Note:** Kræver netadgang til ordbl.dk og en geokodningstjeneste, som var blokeret i det oprindelige udviklingsmiljø.
+**Resultat:** Projektejeren leverede koordinater for alle 20 skoler. Skrødstrup og Kongensgaard var fejlagtigt med i det oprindelige datasæt og er fjernet. Magleby Efterskole på Langeland og Hobro Efterskole er tilføjet, begge bekræftet som ordblindeefterskoler. Mejlby Efterskole lå forkert og er flyttet til Himmerland.
 
 ## Task 004: GitHub Pages hosting
 
