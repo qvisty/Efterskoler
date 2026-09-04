@@ -106,10 +106,18 @@ Acceptkriterier:
 - [x] legend med afstandsintervaller og tydelig markering af at det er luftlinje
 - [x] hover på et område viser afstand og nærmeste synlige skole
 
+#### F4. Delbare scenarie links
+
+Fravalgte skoler og afstandslagets tilstand ligger i URL hashen, fx `#uden=emmerske,store-andst&afstand=1`, så et scenarie kan deles som link.
+
+Acceptkriterier:
+
+- [x] et delt link åbner direkte i scenariet
+- [x] standardvisningen har en ren URL
+
 ### Should have
 
 - reel kørselstid i stedet for luftlinje, precomputed, se roadmap fase 2
-- deling af nuværende visning, fx via URL parametre
 
 ### Could have
 

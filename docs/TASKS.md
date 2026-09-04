@@ -108,6 +108,21 @@ Mål: alle ordblindeefterskoler på et Danmarkskort, hver skole kan slås til og
 
 **Note:** Routing tjenester var blokeret i det oprindelige udviklingsmiljø, beregningen skal køres et sted med netadgang.
 
+## Task 007: Delbar visning via URL
+
+**Status:** DONE
+
+**Formål:** Et scenarie skal kunne deles som link, fx uden Emmerske og Store Andst og med afstandslaget tændt.
+
+**Acceptkriterier:**
+
+- [x] fravalgte skoler og afstandslagets tilstand gemmes i URL hashen
+- [x] et link med hash åbner direkte i det delte scenarie
+- [x] hash ændringer i en åben side slår igennem
+- [x] ukendte skole id'er ignoreres
+
+**Resultat:** Format `#uden=emmerske,store-andst&afstand=1`. Standardvisningen har ingen hash. Verificeret med Playwright.
+
 ## Opdagede tasks
 
 Ingen åbne.

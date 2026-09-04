@@ -137,6 +137,7 @@ document.getElementById("distance-toggle").addEventListener("change", (e) => {
   } else {
     map.removeLayer(distanceLayer);
   }
+  updateHash();
 });
 
 const listEl = document.getElementById("school-list");
@@ -163,6 +164,7 @@ function setVisible(school, on) {
   box.checked = on;
   updateCount();
   updateDistanceLayer();
+  updateHash();
 }
 
 for (const region of REGION_ORDER) {
@@ -210,3 +212,36 @@ const panel = document.getElementById("panel");
 document.getElementById("toggle-panel").addEventListener("click", () => {
   panel.classList.toggle("hidden");
 });
+
+/* Delbar visning: fravalgte skoler og afstandslagets tilstand ligger i
+   URL hashen, fx #uden=emmerske,store-andst&afstand=1, så et scenarie
+   kan deles som link. */
+
+function updateHash() {
+  const uden = SCHOOLS.filter((s) => !visible.has(s.id)).map((s) => s.id);
+  const parts = [];
+  if (uden.length) parts.push("uden=" + uden.join(","));
+  if (distanceLayerOn) parts.push("afstand=1");
+  history.replaceState(
+    null,
+    "",
+    parts.length ? "#" + parts.join("&") : location.pathname + location.search
+  );
+}
+
+function applyHash() {
+  const params = new URLSearchParams(location.hash.slice(1));
+  const uden = new Set((params.get("uden") || "").split(",").filter(Boolean));
+  for (const school of SCHOOLS) {
+    setVisible(school, !uden.has(school.id));
+  }
+  const wantLayer = params.get("afstand") === "1";
+  const toggle = document.getElementById("distance-toggle");
+  if (toggle.checked !== wantLayer) {
+    toggle.checked = wantLayer;
+    toggle.dispatchEvent(new Event("change"));
+  }
+}
+
+window.addEventListener("hashchange", applyHash);
+applyHash();

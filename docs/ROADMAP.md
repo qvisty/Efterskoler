@@ -49,11 +49,11 @@ Mangler:
 
 ## Fase 3: Deling og finpudsning
 
-**Status: TODO**
+**Status: IN PROGRESS**
 
-- GitHub Pages hosting
-- delbar visning via URL parametre
-- gennemgang af mobilvisning og tilgængelighed
+- GitHub Pages hosting: DONE, https://qvisty.github.io/Efterskoler/
+- delbar visning via URL parametre: DONE
+- gennemgang af mobilvisning og tilgængelighed: TODO
 
 ## Senere muligheder
 
