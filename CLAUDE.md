@@ -313,8 +313,18 @@ Hvis `/init` køres, eller en agent vil dokumentere kommandoer og arkitektur i d
 
 ## Kommandoer
 
-Udfyldes når stacken er valgt: setup, start af udviklingsmiljø, tests, lint, migrations og andre daglige kommandoer.
+Ingen build steps og ingen dependencies at installere.
+
+- Start lokalt: `python3 -m http.server` i projektroden og åbn `http://localhost:8000`. `index.html` kan også åbnes direkte i en browser.
+- Der er ingen automatiske tests. Verifikation sker ved at inspicere kortet i en browser, fx via Playwright screenshot.
 
 ## Arkitektur i denne kodebase
 
-Udfyldes når stacken er valgt: valgt stack, overordnet struktur og de vigtigste patterns. Detaljer hører hjemme i `docs/ARCHITECTURE.md`; her står kun det en agent skal vide for at arbejde effektivt i kodebasen.
+Statisk site uden backend og database. Interaktivt Leaflet kort over ordblindeefterskoler i Danmark.
+
+- `index.html`: layout, styling og togglepanel
+- `js/app.js`: kortopsætning, markører og toggle logik
+- `data/schools.js`: datasættet, én record pr. skole, definerer `SCHOOLS`
+- `vendor/leaflet/`: Leaflet 1.9.4, vendoret, må ikke redigeres i hånden
+
+Korttiles hentes fra OpenStreetMap på runtime, alt andet er lokalt. Detaljer i `docs/ARCHITECTURE.md`.

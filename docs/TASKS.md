@@ -9,168 +9,80 @@ Hver task skal:
 - kunne testes eller verificeres
 - have tydelig status
 
-Tilladte statusser:
+Tilladte statusser: TODO, IN PROGRESS, BLOCKED, REVIEW, DONE.
 
-```text
-TODO
-IN PROGRESS
-BLOCKED
-REVIEW
-DONE
-```
-
-En task er først DONE når dens acceptkriterier og Definition of Done er verificeret.
-
-### Fuldt og let format
-
-Brug det fulde taskformat (som Task 001 nedenfor) til opgaver med reel kompleksitet.
-
-Små, trivielle opgaver må bruge det lette format, så filen ikke vokser unødvendigt:
-
-```markdown
-## Task XXX: [NAVN]
-
-**Status:** TODO
-
-**Formål:** [ÉN LINJE]
-
-**Acceptkriterier:**
-
-- [ ] [KRITERIUM]
-
-**Resultat:** [KORT, UDFYLDES VED DONE]
-```
-
-### Arkivering
-
-Når en milestone er afsluttet, flyttes dens DONE tasks til `docs/TASKS_ARCHIVE.md` (opret filen ved behov, samme struktur som her). Denne fil skal kun indeholde den aktive plan og forblive kort nok til at kunne læses i sin helhed.
+Når en milestone er afsluttet, flyttes dens DONE tasks til `docs/TASKS_ARCHIVE.md`.
 
 ## Aktuel milestone
 
-[MILESTONE]
+Fase 1: Interaktivt kort med toggles, MVP.
 
-Mål:
+Mål: alle ordblindeefterskoler på et Danmarkskort, hver skole kan slås til og fra, Emmerske fremhævet.
 
-[KORT BESKRIVELSE]
+## Task 001: Datasæt over ordblindeefterskolerne
 
-## Task 001: [NAVN]
+**Status:** DONE
 
-**Status:** TODO
+**Formål:** Ét datasæt i `data/schools.js` med alle skoler i foreningen Ordblindeefterskolerne.
 
-### Formål
+**Acceptkriterier:**
 
-[Hvad skal opgaven opnå?]
+- [x] alle 20 skoler med navn, by, region, koordinater og website
+- [x] Emmerske markeret med `highlight: true`
+- [x] usikre records markeret med `verified: false`
 
-### Afhængigheder
+**Resultat:** 20 skoler indsamlet via websøgninger, da ordbl.dk ikke kunne tilgås direkte fra udviklingsmiljøet. Koordinater sat ud fra by og område. Skrødstrup Efterskole markeret som uverificeret.
 
-Ingen
+## Task 002: Interaktivt kort med togglepanel
 
-eller:
+**Status:** DONE
 
-- Task XXX
+**Formål:** Leaflet kort over Danmark med markører, popups og panel hvor hver skole kan slås til og fra.
 
-### Forventede områder
+**Acceptkriterier:**
 
-```text
-[mapper/filer]
-```
+- [x] kortet åbner centreret på Danmark med alle skoler synlige
+- [x] popup med navn, by og link til website
+- [x] checkboks pr. skole, vælg alle og fravælg alle
+- [x] Emmerske fremhævet i både kort og panel
+- [x] brugbar på mobil, panelet kan klappes sammen
 
-Dette er vejledende. Undersøg eksisterende kode før implementering.
+**Resultat:** `index.html`, `js/app.js` og vendoret Leaflet 1.9.4. Verificeret med screenshot via lokal server og Playwright.
 
-### Acceptkriterier
-
-- [ ] [KRITERIUM]
-- [ ] [KRITERIUM]
-- [ ] [KRITERIUM]
-
-### Verifikation
-
-- [ ] happy path
-- [ ] invalid input hvis relevant
-- [ ] permissions hvis relevant
-- [ ] edge cases
-- [ ] relevante automatiske tests
-- [ ] faktisk output inspiceret
-
-### Gauntlet
-
-Efter implementering:
-
-1. kør relevante tests
-2. inspicér faktisk output
-3. sammenlign med krav eller reference
-4. identificér største resterende mangel
-5. ret manglen
-6. gentag indtil acceptkriterierne er opfyldt
-
-### Resultat
-
-**Implementeret:**
-
-[RESULTAT]
-
-**Tests/verifikation:**
-
-[RESULTAT]
-
-**Største kritikpunkt:**
-
-[RESULTAT]
-
-**Resterende risici:**
-
-[RESULTAT]
-
-## Task 002: [NAVN]
+## Task 003: Verificér skoleliste og koordinater
 
 **Status:** TODO
 
-### Formål
+**Formål:** Koordinaterne er sat ud fra bynavne og skal kontrolleres mod skolernes faktiske adresser, fx via ordbl.dk og skolernes egne hjemmesider.
 
-[...]
+**Acceptkriterier:**
 
-### Acceptkriterier
+- [ ] alle 20 skolers adresser slået op hos en autoritativ kilde
+- [ ] koordinater opdateret til adresseniveau, fx via DAWA eller Nominatim
+- [ ] Skrødstrup Efterskoles medlemskab af Ordblindeefterskolerne be- eller afkræftet
+- [ ] `verified: false` markeringer fjernet eller records rettet
 
-- [ ] [KRITERIUM]
+**Note:** Kræver netadgang til ordbl.dk og en geokodningstjeneste, som var blokeret i det oprindelige udviklingsmiljø.
 
-### Verifikation
+## Task 004: GitHub Pages hosting
 
-- [ ] [KONTROL]
+**Status:** TODO
+
+**Formål:** Gøre kortet delbart som link.
+
+**Acceptkriterier:**
+
+- [ ] sitet er tilgængeligt på en offentlig URL
+- [ ] README opdateret med linket
 
 ## Opdagede tasks
 
-Nye nødvendige tasks registreres her først.
-
-- [ ] [TASK]
-
-De må ikke automatisk implementeres hvis de udvider scope.
+- [ ] Fase 2 afklaring: kørselsafstand kontra fugleflugt, precomputed data kontra ekstern service, se `docs/ROADMAP.md`
 
 ## Teknisk gæld
 
-Registrér kun konkret identificeret teknisk gæld.
-
-- [ ] [PROBLEM]
-  - Konsekvens: [KONSEKVENS]
-  - Foreslået løsning: [LØSNING]
+Ingen registreret.
 
 ## Bugs
 
-### Bug 001: [TITEL]
-
-**Status:** TODO
-
-**Beskrivelse:**
-
-[...]
-
-**Forventet:**
-
-[...]
-
-**Faktisk:**
-
-[...]
-
-**Regressionstest:**
-
-- [ ] [TEST]
+Ingen registreret.

@@ -2,120 +2,63 @@
 
 ## Produkt
 
-[PROJEKTNAVN]
+Ordblindeefterskoler i Danmark, interaktivt kort.
 
 ## Princip
 
-Roadmappet beskriver produktets progression. Det er ikke en detaljeret taskliste.
-
-Detaljerede opgaver findes i `docs/TASKS.md`.
+Roadmappet beskriver produktets progression. Detaljerede opgaver findes i `docs/TASKS.md`.
 
 ## Fase 0: Afklaring og fundament
 
-Mål:
+**Status: DONE**
 
-- forstå problemet
-- definere MVP
-- vælge stack
-- vælge database
-- vælge udviklingsmiljø
-- dokumentere arkitektur
+- problem og MVP defineret i `docs/PRD.md`
+- stack valgt, statisk site med Leaflet, se `docs/ARCHITECTURE.md`
+- ingen database, se `docs/DATABASE.md`
 
-Exit criteria:
+## Fase 1: Interaktivt kort med toggles, MVP
 
-- PRD er implementeringsklar
-- væsentlige teknologivalg er dokumenteret
-- første milestone er opdelt i tasks
+**Status: IN PROGRESS**
 
-## Fase 1: Core domain
-
-Mål:
-
-Implementere den centrale datamodel og business logic.
+Mål: alle ordblindeefterskoler på et Danmarkskort, hver skole kan slås til og fra, Emmerske fremhævet.
 
 Leverancer:
 
-- [DOMAIN MODEL]
-- [DOMAIN MODEL]
-- centrale regler
-- permissions hvor relevant
+- datasæt over ordblindeefterskolerne
+- Leaflet kort med markører og popups
+- togglepanel med enkeltvalg, vælg alle og fravælg alle
 
 Exit criteria:
 
-- centrale business rules fungerer
-- relevante tests består
+- MVP kravene i `docs/PRD.md` er opfyldt
+- koordinater og skoleliste er verificeret mod faktiske adresser
 
-## Fase 2: Første komplette brugerrejse
+## Fase 2: Afstandsanalyse
 
-Mål:
+**Status: TODO**
 
-En bruger kan gennemføre produktets vigtigste workflow fra start til slut.
+Mål: farvelægning af Danmark efter kørselsafstand til nærmeste ordblindeefterskole, så hullet efter en lukning af Emmerske kan vises direkte.
 
-```text
-[START]
-↓
-[HANDLING]
-↓
-[HANDLING]
-↓
-[RESULTAT]
-```
+Skal afklares først:
 
-Exit criteria:
+- kørselsafstand via routing service, fx OSRM, eller fugleflugt
+- precomputed statisk GeoJSON kontra beregning i browseren
+- visning af to scenarier, med og uden Emmerske
 
-- workflow fungerer
-- fejlscenarier håndteres
-- permissions er testet hvor relevant
-- brugeroplevelsen er forståelig
+## Fase 3: Deling og finpudsning
 
-## Fase 3: MVP
+**Status: TODO**
 
-Mål:
-
-Produktet kan anvendes af rigtige brugere.
-
-Indhold:
-
-- [FUNKTION]
-- [FUNKTION]
-- [FUNKTION]
-
-Exit criteria:
-
-Alle MVP krav i `PRD.md` er opfyldt.
-
-## Fase 4: Stabilisering
-
-Fokus:
-
-- bugs
-- performance
-- accessibility
-- sikkerhed
-- logging
-- UX
-- dokumentation
-
-## Fase 5: Production
-
-Kun når projektet kræver det.
-
-Vurder:
-
-- deployment
-- backups
-- monitoring
-- error tracking
-- CI/CD
-- security review
-- rollback
+- GitHub Pages hosting
+- delbar visning via URL parametre
+- gennemgang af mobilvisning og tilgængelighed
 
 ## Senere muligheder
 
 Ikke del af nuværende scope:
 
-- [IDÉ]
-- [IDÉ]
-- [IDÉ]
+- elevtal eller kapacitet pr. skole
+- andre specialefterskoletyper som ekstra lag
+- eksport af kortudsnit som billede
 
-Disse må ikke implementeres automatisk uden ændring af PRD og roadmap.
+Disse må ikke implementeres uden ændring af PRD og roadmap.

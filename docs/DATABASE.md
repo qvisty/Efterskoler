@@ -2,179 +2,58 @@
 
 ## Status
 
-**Database:** UNDECIDED
-
-Database vælges som en arkitekturbeslutning og skal holdes så enkel som muligt.
+**Database:** INGEN. Data ligger i en statisk JavaScript fil.
 
 ## Beslutningsgrundlag
 
-Beskriv:
-
-- forventet antal brugere
-- forventet samtidighed
-- datamængde
-- write belastning
-- relationel kompleksitet
-- realtimebehov
-- backupbehov
-- deployment
-- driftskompleksitet
-- omkostninger
+- datasættet er ca. 20 ordblindeefterskoler
+- data ændrer sig sjældent, skoler åbner og lukker ikke ofte
+- ingen brugere, ingen skrivninger fra frontend
+- ingen samtidighed, ingen realtime
+- backup er git
 
 ## Kandidater
 
 ### SQLite
 
-**Status:** PASS / FAIL / TBD
+**Status:** FRAVALGT
 
-Begrundelse:
+En database, selv SQLite, kræver serverlogik for at blive læst fra en browser. Sitet er rent statisk, så selv den simpleste database er mere end nødvendigt.
 
-[BEGRUNDELSE]
+### Supabase og traditionel PostgreSQL
 
-### Supabase
+**Status:** FRAVALGT
 
-**Status:** PASS / FAIL / TBD
-
-Vurder separat:
-
-- managed PostgreSQL
-- Auth
-- Storage
-- Realtime
-- Edge Functions
-
-Begrundelse:
-
-[BEGRUNDELSE]
-
-### Traditionel PostgreSQL
-
-**Status:** PASS / FAIL / TBD
-
-Begrundelse:
-
-[BEGRUNDELSE]
-
-### Andet
-
-Kun hvis et konkret behov kræver det.
+Ingen managed services er nødvendige for 20 statiske records.
 
 ## Valgt løsning
 
-**Database:** [VALG]
+**Database:** Statisk fil, `data/schools.js`, versionsstyret i git.
 
-**Hvorfor:**
+**Hvorfor:** Simplest mulige løsning der opfylder behovet. Kan senere konverteres til GeoJSON eller importeres i en database uden tab, hvis behovet opstår.
 
-[BEGRUNDELSE]
+## Datamodel
 
-**Hvorfor simplere løsninger ikke er tilstrækkelige, hvis relevant:**
+### School
 
-[BEGRUNDELSE]
-
-## Entiteter
-
-### [ENTITY]
-
-Formål:
-
-[Beskrivelse]
-
-Felter:
+Én record pr. ordblindeefterskole i `data/schools.js`:
 
 ```text
-id
-...
-created_at
-updated_at
+id          stabil slug, fx "emmerske"
+name        skolens navn
+town        by eller område
+region      landsdel til gruppering i panelet
+lat, lng    WGS84 koordinater
+website     skolens hjemmeside
+highlight   true for Emmerske Efterskole
 ```
 
-Relationer:
+## Datakvalitet
 
-```text
-...
-```
-
-Constraints:
-
-```text
-...
-```
-
-Indexes:
-
-```text
-...
-```
-
-## Relationer
-
-```text
-[ENTITY A]
-   │
-   │ 1:N
-   ↓
-[ENTITY B]
-```
-
-## Constraints
-
-Brug databasen aktivt til at beskytte dataintegritet, når det giver mening.
-
-Dokumentér relevante:
-
-- uniqueness regler
-- check constraints
-- foreign key regler
-- delete behaviour
-
-## Indexing
-
-Opret indexes på baggrund af faktiske query patterns. Undgå spekulative indexes.
+- Kilden er foreningen Ordblindeefterskolerne, ordbl.dk, som har 20 medlemsskoler, suppleret med søgeresultater, da direkte opslag ikke var muligt fra udviklingsmiljøet
+- Koordinater er sat ud fra skolernes by og område, ikke ud fra opslag på den præcise adresse. Præcisionen er typisk inden for 1 til 2 km, hvilket er nok til et Danmarkskort, men de skal verificeres, se task i `docs/TASKS.md`
+- Skrødstrup Efterskoles medlemskab af foreningen skal verificeres, skolen er markeret med `verified: false` i datasættet
 
 ## Persondata
 
-For data med personoplysninger beskrives:
-
-- formål
-- adgang
-- retention
-- sletning
-- eventuel audit trail
-- logging
-
-## Data lifecycle
-
-### Oprettelse
-
-[FLOW]
-
-### Ændring
-
-[FLOW]
-
-### Arkivering
-
-[FLOW]
-
-### Sletning
-
-[FLOW]
-
-## Backup og restore
-
-- Backupstrategi: [TBD]
-- Restore procedure: [TBD]
-- Test af restore: [TBD]
-
-## Migration strategy
-
-Hvis frameworket bruger migrations:
-
-- migrations versionsstyres sammen med kode
-- migrations testes før deployment
-- store datamigrationer vurderes separat
-- eksisterende migrations omskrives normalt ikke
-
-## Åbne databasebeslutninger
-
-- [ ] [SPØRGSMÅL]
+Ingen. Alle felter er offentlige skoleoplysninger.
