@@ -26,7 +26,7 @@ Produktet skal gøre det muligt at:
 
 Produktet skal i første version ikke:
 
-- beregne eller vise kørselsafstande eller heatmap, det kommer i en senere milestone
+- beregne reelle kørselstider, afstandslaget bruger luftlinje indtil en precomputed kørselstidsløsning er på plads
 - have login, brugere eller administration
 - have backend eller database
 - vise andre skoletyper end ordblindeefterskoler
@@ -95,14 +95,24 @@ Acceptkriterier:
 - [x] vælg alle og fravælg alle virker
 - [x] Emmerske er fremhævet i både liste og kort
 
+#### F3. Afstandslag
+
+Et togglebart lag der farvelægger Danmarks landareal efter afstand til nærmeste synlige skole. Laget genberegnes øjeblikkeligt, når skoler slås til og fra, så scenarier som "uden Emmerske og Store Andst" kan vises direkte. Første version bruger luftlinjeafstand og siger det tydeligt i legenden.
+
+Acceptkriterier:
+
+- [x] laget kan tændes og slukkes uafhængigt, og kortet uden laget er uændret
+- [x] farvelægningen følger kun de synlige skoler og opdateres ved toggle
+- [x] legend med afstandsintervaller og tydelig markering af at det er luftlinje
+- [x] hover på et område viser afstand og nærmeste synlige skole
+
 ### Should have
 
+- reel kørselstid i stedet for luftlinje, precomputed, se roadmap fase 2
 - deling af nuværende visning, fx via URL parametre
-- afstandscirkler omkring hver skole som simpel forsmag på afstandsanalysen
 
 ### Could have
 
-- heatmap eller farvelagte zoner efter kørselsafstand til nærmeste skole, se roadmap fase 2
 - scenariesammenligning side om side, med og uden Emmerske
 
 ## UX krav

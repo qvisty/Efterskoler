@@ -35,15 +35,17 @@ Exit criteria:
 
 ## Fase 2: Afstandsanalyse
 
-**Status: TODO**
+**Status: IN PROGRESS**
 
-Mål: farvelægning af Danmark efter kørselsafstand til nærmeste ordblindeefterskole, så hullet efter en lukning af Emmerske kan vises direkte.
+Mål: farvelægning af Danmark efter afstand til nærmeste synlige ordblindeefterskole, så hullet efter en lukning af Emmerske kan vises direkte.
 
-Skal afklares først:
+Leveret:
 
-- kørselsafstand via routing service, fx OSRM, eller fugleflugt
-- precomputed statisk GeoJSON kontra beregning i browseren
-- visning af to scenarier, med og uden Emmerske
+- togglebart afstandslag med luftlinjeafstand, beregnet i browseren over et gitter af landpunkter, opdateres når skoler slås til og fra
+
+Mangler:
+
+- reel kørselstid i stedet for luftlinje. Kræver en engangsberegning af kørselstid fra alle gitterpunkter til alle skoler, fx via OSRM, gemt som statisk fil. Routing tjenester var blokeret i udviklingsmiljøet, se Task 006
 
 ## Fase 3: Deling og finpudsning
 

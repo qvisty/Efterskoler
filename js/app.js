@@ -54,6 +54,95 @@ for (const school of SCHOOLS) {
   markers.set(school.id, marker);
 }
 
+/* Afstandslag: gitterceller over Danmarks landareal, farvet efter afstand
+   i luftlinje til nærmeste synlige skole. Gitteret kommer fra data/grid.js. */
+
+const DISTANCE_BINS = [
+  { max: 25, color: "#fee5d9" },
+  { max: 50, color: "#fcae91" },
+  { max: 75, color: "#fb6a4a" },
+  { max: 100, color: "#de2d26" },
+  { max: Infinity, color: "#a50f15" },
+];
+
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const rad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * rad;
+  const dLng = (lng2 - lng1) * rad;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(a));
+}
+
+function binColor(km) {
+  for (const bin of DISTANCE_BINS) {
+    if (km < bin.max) return bin.color;
+  }
+  return DISTANCE_BINS[DISTANCE_BINS.length - 1].color;
+}
+
+map.createPane("distancePane");
+map.getPane("distancePane").style.zIndex = 350;
+const distanceRenderer = L.canvas({ pane: "distancePane" });
+const distanceLayer = L.layerGroup();
+const distanceCells = [];
+let distanceLayerOn = false;
+
+for (const [lat, lng] of GRID.points) {
+  const cell = L.rectangle(
+    [
+      [lat - GRID.latStep / 2, lng - GRID.lngStep / 2],
+      [lat + GRID.latStep / 2, lng + GRID.lngStep / 2],
+    ],
+    {
+      renderer: distanceRenderer,
+      pane: "distancePane",
+      stroke: false,
+      fillColor: DISTANCE_BINS[0].color,
+      fillOpacity: 0.55,
+    }
+  );
+  cell.bindTooltip(() => cell._distanceText, { sticky: true, direction: "top" });
+  distanceCells.push({ lat, lng, cell });
+  distanceLayer.addLayer(cell);
+}
+
+function updateDistanceLayer() {
+  if (!distanceLayerOn) return;
+  const active = SCHOOLS.filter((s) => visible.has(s.id));
+  for (const { lat, lng, cell } of distanceCells) {
+    if (active.length === 0) {
+      cell.setStyle({ fillColor: binColor(Infinity) });
+      cell._distanceText = "Ingen skoler valgt";
+      continue;
+    }
+    let min = Infinity;
+    let nearest = null;
+    for (const s of active) {
+      const d = haversineKm(lat, lng, s.lat, s.lng);
+      if (d < min) {
+        min = d;
+        nearest = s;
+      }
+    }
+    cell.setStyle({ fillColor: binColor(min) });
+    cell._distanceText = `${Math.round(min)} km i luftlinje til ${nearest.name}`;
+  }
+}
+
+const legendEl = document.getElementById("legend");
+document.getElementById("distance-toggle").addEventListener("change", (e) => {
+  distanceLayerOn = e.target.checked;
+  legendEl.hidden = !distanceLayerOn;
+  if (distanceLayerOn) {
+    updateDistanceLayer();
+    distanceLayer.addTo(map);
+  } else {
+    map.removeLayer(distanceLayer);
+  }
+});
+
 const listEl = document.getElementById("school-list");
 const countEl = document.getElementById("count");
 const visible = new Set(SCHOOLS.map((s) => s.id));
@@ -77,6 +166,7 @@ function setVisible(school, on) {
   }
   box.checked = on;
   updateCount();
+  updateDistanceLayer();
 }
 
 for (const region of REGION_ORDER) {

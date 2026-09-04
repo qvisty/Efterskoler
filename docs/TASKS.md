@@ -77,9 +77,41 @@ Mål: alle ordblindeefterskoler på et Danmarkskort, hver skole kan slås til og
 
 **Resultat:** Deploy workflow i `.github/workflows/pages.yml`, hvert push til main deployer automatisk. Sitet ligger på https://qvisty.github.io/Efterskoler/. Pages blev aktiveret manuelt i repo settings, da workflow tokenet ikke må oprette Pages sitet.
 
+## Task 005: Afstandslag med luftlinjeafstand
+
+**Status:** DONE
+
+**Formål:** Togglebart lag der farvelægger Danmark efter afstand til nærmeste synlige skole, som fundament for fase 2.
+
+**Acceptkriterier:**
+
+- [x] gitter over Danmarks landareal, genereret af `scripts/generate_grid.mjs` til `data/grid.js`
+- [x] laget har egen toggle og ændrer intet, når det er slukket
+- [x] farver opdateres øjeblikkeligt når skoler slås til og fra
+- [x] legend med intervaller og note om at det er luftlinje
+- [x] hover viser afstand og nærmeste synlige skole
+
+**Resultat:** Ca. 2650 gitterceller a 4 km farvet i fem intervaller, lys til mørk rød. Verificeret med Playwright screenshots, scenariet uden Emmerske og Store Andst farver Sydvestjylland mørkerødt.
+
+## Task 006: Kørselstid i stedet for luftlinje
+
+**Status:** TODO
+
+**Formål:** Afstandslaget skal vise reel rejsetid i bil, ikke luftlinje.
+
+**Skitse:** Engangsberegning af kørselstid fra hvert gitterpunkt i `data/grid.js` til alle skoler, fx via en lokal OSRM instans eller OpenRouteService, gemt som statisk fil `data/traveltimes.js`. Frontend vælger så minimum over synlige skoler, samme logik som nu. Ved manglende data falder laget tilbage til luftlinje.
+
+**Acceptkriterier:**
+
+- [ ] kørselstider precomputed for alle gitterpunkt-skole par
+- [ ] legenden skifter til minutter
+- [ ] toggle adfærden er uændret
+
+**Note:** Routing tjenester var blokeret i det oprindelige udviklingsmiljø, beregningen skal køres et sted med netadgang.
+
 ## Opdagede tasks
 
-- [ ] Fase 2 afklaring: kørselsafstand kontra fugleflugt, precomputed data kontra ekstern service, se `docs/ROADMAP.md`
+Ingen åbne.
 
 ## Teknisk gæld
 

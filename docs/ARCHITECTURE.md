@@ -69,12 +69,18 @@ Native, ingen Docker, ingen build steps.
 
 ```text
 Browser
-   ├── index.html          side, styling og togglepanel
-   ├── js/app.js           kortopsætning og toggle logik
+   ├── index.html          side, styling, togglepanel og legend
+   ├── js/app.js           kortopsætning, toggle logik og afstandslag
    ├── data/schools.js     datasæt over ordblindeefterskoler
+   ├── data/grid.js        gitterpunkter over Danmarks landareal, genereret
    ├── vendor/leaflet/     Leaflet 1.9.4, vendoret
    └── OpenStreetMap       korttiles, eneste eksterne afhængighed
+
+scripts/generate_grid.mjs  regenererer data/grid.js fra Natural Earth data
 ```
+
+Afstandslaget tegner en canvas rektangel pr. gitterpunkt, farvet efter
+luftlinjeafstand til nærmeste synlige skole, og genberegner ved hver toggle.
 
 ## Domæner og komponenter
 
@@ -90,7 +96,7 @@ Browser
 
 ## Fase 2, afstandsanalyse
 
-Ikke implementeret endnu. Forventet tilgang: en engangsberegning af kørselsafstand fra et grid af punkter i Danmark til nærmeste skole, fx via OSRM, gemt som statisk GeoJSON der farvelægges i Leaflet. Dermed bevares arkitekturen uden server. Beslutningen træffes når fasen starter.
+Første del er leveret som luftlinjelag beregnet i browseren. Opgradering til reel kørselstid sker som en engangsberegning af rejsetid fra alle gitterpunkter til alle skoler, gemt som statisk fil, så arkitekturen forbliver uden server. Se Task 006 i `docs/TASKS.md`.
 
 ## Deployment
 
