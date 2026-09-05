@@ -8,6 +8,8 @@ L.control.zoom({ position: "bottomright" }).addTo(map);
 
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 18,
+  // crossOrigin gør at tiles kan tegnes i eksportcanvas uden at taint'e det.
+  crossOrigin: "anonymous",
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>-bidragydere',
 }).addTo(map);
 
@@ -180,6 +182,32 @@ function valueAt(pointIndex, active) {
   return { min, nearest };
 }
 
+// Nøgletal: andel af landcellerne over 75 km, i køretidstilstand 90 min.
+// Netop den grænse flytter sig mest i scenarierne uden de sydvestlige
+// skoler og følger en intervalgrænse i legenden.
+const STAT_THRESHOLD = BINS[BINS.length - 3].max;
+const statEl = document.getElementById("stat");
+const statValueEl = document.getElementById("stat-value");
+const statLabelEl = document.getElementById("stat-label");
+let statText = { value: "", label: "" };
+
+function formatPct(share) {
+  const pct = share * 100;
+  const text = pct > 0 && pct < 10 ? pct.toFixed(1).replace(".", ",") : String(Math.round(pct));
+  return `${text} %`;
+}
+
+function updateStat(countOver) {
+  statText = {
+    value: formatPct(countOver / GRID.points.length),
+    label: travelMode
+      ? `af Danmarks areal har over ${STAT_THRESHOLD} min i bil til nærmeste valgte skole`
+      : `af Danmarks areal har over ${STAT_THRESHOLD} km i luftlinje til nærmeste valgte skole`,
+  };
+  statValueEl.textContent = statText.value;
+  statLabelEl.textContent = statText.label;
+}
+
 function redrawDistanceCanvas() {
   const W = distanceCanvas.width;
   const H = distanceCanvas.height;
@@ -188,9 +216,11 @@ function redrawDistanceCanvas() {
   const active = SCHOOLS.filter((s) => visible.has(s.id));
   const halfLat = GRID.latStep / 2;
   const halfLng = GRID.lngStep / 2;
+  let countOver = 0;
   for (let i = 0; i < GRID.points.length; i++) {
     const [lat, lng] = GRID.points[i];
     const { min } = active.length ? valueAt(i, active) : { min: Infinity };
+    if (min >= STAT_THRESHOLD) countOver++;
     ctx.fillStyle = binColor(min);
     const x = ((lng - halfLng - grid.minLng) / lngRange) * W;
     const w = (GRID.lngStep / lngRange) * W;
@@ -199,6 +229,7 @@ function redrawDistanceCanvas() {
     // Lille overlap så der ikke opstår hairlines mellem cellerne.
     ctx.fillRect(x, yTop, w + 0.5, yBot - yTop + 0.5);
   }
+  updateStat(countOver);
   distanceOverlay.setUrl(distanceCanvas.toDataURL());
 }
 
@@ -258,6 +289,7 @@ legendEl.appendChild(note);
 document.getElementById("distance-toggle").addEventListener("change", (e) => {
   distanceLayerOn = e.target.checked;
   legendEl.hidden = !distanceLayerOn;
+  statEl.hidden = !distanceLayerOn;
   if (distanceLayerOn) {
     redrawDistanceCanvas();
     distanceOverlay.addTo(map);
@@ -293,6 +325,7 @@ function setVisible(school, on) {
   updateCount();
   updateDistanceLayer();
   updateHash();
+  refreshScenarioButtons();
 }
 
 for (const region of REGION_ORDER) {
@@ -328,6 +361,51 @@ for (const region of REGION_ORDER) {
 
 updateCount();
 
+/* Scenarieknapper: faste valg til præsentation, ét klik sætter
+   skolevalget og tænder afstandslaget. */
+
+const SCENARIOS = [
+  { id: "idag", label: "I dag", uden: [] },
+  { id: "uden-emmerske", label: "Uden Emmerske", uden: ["emmerske"] },
+  {
+    id: "uden-emmerske-store-andst",
+    label: "Uden Emmerske og Store Andst",
+    uden: ["emmerske", "store-andst"],
+  },
+];
+
+const scenariosEl = document.getElementById("scenarios");
+for (const scenario of SCENARIOS) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.id = `scenario-${scenario.id}`;
+  btn.textContent = scenario.label;
+  btn.addEventListener("click", () => applyScenario(scenario));
+  scenariosEl.appendChild(btn);
+}
+
+function applyScenario(scenario) {
+  const uden = new Set(scenario.uden);
+  for (const school of SCHOOLS) {
+    setVisible(school, !uden.has(school.id));
+  }
+  const toggle = document.getElementById("distance-toggle");
+  if (!toggle.checked) {
+    toggle.checked = true;
+    toggle.dispatchEvent(new Event("change"));
+  }
+}
+
+function refreshScenarioButtons() {
+  const hidden = SCHOOLS.filter((s) => !visible.has(s.id)).map((s) => s.id).sort().join();
+  for (const scenario of SCENARIOS) {
+    const btn = document.getElementById(`scenario-${scenario.id}`);
+    btn.classList.toggle("active", hidden === [...scenario.uden].sort().join());
+  }
+}
+
+refreshScenarioButtons();
+
 document.getElementById("select-all").addEventListener("click", () => {
   for (const school of SCHOOLS) setVisible(school, true);
 });
@@ -353,6 +431,177 @@ panelToggle.addEventListener("click", () => {
 if (window.matchMedia("(max-width: 640px)").matches) {
   setPanelOpen(false);
 }
+
+/* Eksport: tegner kortets tiles, afstandslag og markører sammen i ét
+   canvas med en infoboks og OpenStreetMap attribution, og downloader
+   det som PNG. */
+
+function drawInfoBox(ctx, mapWidth) {
+  const pad = 12;
+  const lineHeight = 17;
+  const boxWidth = 300;
+  const lines = [];
+  const hiddenSchools = SCHOOLS.filter((s) => !visible.has(s.id));
+  lines.push({ text: `${visible.size} af ${SCHOOLS.length} ordblindeefterskoler vist`, font: "12px sans-serif", color: "#5a6270" });
+  if (hiddenSchools.length) {
+    const names = hiddenSchools.map((s) => s.name).join(", ");
+    lines.push({ text: `Uden: ${names}`, font: "12px sans-serif", color: "#5a6270", wrap: true });
+  }
+
+  // Grov linjeombrydning af lange linjer.
+  const wrapped = [];
+  ctx.font = "12px sans-serif";
+  for (const line of lines) {
+    if (!line.wrap || ctx.measureText(line.text).width <= boxWidth - 2 * pad) {
+      wrapped.push(line);
+      continue;
+    }
+    let current = "";
+    for (const word of line.text.split(" ")) {
+      const next = current ? `${current} ${word}` : word;
+      if (ctx.measureText(next).width > boxWidth - 2 * pad && current) {
+        wrapped.push({ ...line, text: current });
+        current = word;
+      } else {
+        current = next;
+      }
+    }
+    if (current) wrapped.push({ ...line, text: current });
+  }
+
+  const legendLines = distanceLayerOn ? BINS.length + 1 : 0;
+  const statHeight = distanceLayerOn ? 44 : 0;
+  const height =
+    pad + 20 + wrapped.length * lineHeight + statHeight + legendLines * lineHeight + pad;
+
+  ctx.save();
+  ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
+  ctx.strokeStyle = "#c6ccd4";
+  ctx.beginPath();
+  ctx.roundRect(12, 12, boxWidth, height, 10);
+  ctx.fill();
+  ctx.stroke();
+
+  let y = 12 + pad + 8;
+  ctx.fillStyle = "#1f2430";
+  ctx.font = "bold 14px sans-serif";
+  ctx.fillText("Ordblindeefterskoler i Danmark", 12 + pad, y);
+  y += 20;
+
+  for (const line of wrapped) {
+    ctx.font = line.font;
+    ctx.fillStyle = line.color;
+    ctx.fillText(line.text, 12 + pad, y);
+    y += lineHeight;
+  }
+
+  if (distanceLayerOn) {
+    y += 6;
+    ctx.font = "bold 20px sans-serif";
+    ctx.fillStyle = "#d9480f";
+    ctx.fillText(statText.value, 12 + pad, y + 6);
+    y += 24;
+    ctx.font = "11px sans-serif";
+    ctx.fillStyle = "#5a6270";
+    // Stat teksten er for lang til én linje, del den på "til".
+    const cut = statText.label.indexOf(" til nærmeste");
+    ctx.fillText(statText.label.slice(0, cut), 12 + pad, y);
+    y += 14;
+    ctx.fillText(statText.label.slice(cut + 1), 12 + pad, y);
+    y += lineHeight;
+    for (const bin of BINS) {
+      ctx.fillStyle = bin.color;
+      ctx.fillRect(12 + pad, y - 9, 16, 11);
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
+      ctx.strokeRect(12 + pad, y - 9, 16, 11);
+      ctx.fillStyle = "#454c58";
+      ctx.font = "11px sans-serif";
+      ctx.fillText(bin.label, 12 + pad + 23, y);
+      y += lineHeight;
+    }
+  }
+  ctx.restore();
+
+  // OpenStreetMap kræver attribution på gengivelser af deres tiles.
+  ctx.font = "10px sans-serif";
+  const attr = "© OpenStreetMap-bidragydere";
+  const attrWidth = ctx.measureText(attr).width;
+  ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+  ctx.fillRect(mapWidth - attrWidth - 12, 0, attrWidth + 12, 16);
+  ctx.fillStyle = "#454c58";
+  ctx.fillText(attr, mapWidth - attrWidth - 6, 11);
+}
+
+function buildExportCanvas() {
+  map.closeTooltip(hoverTip);
+  const container = map.getContainer();
+  const rect = container.getBoundingClientRect();
+  const scale = 2;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(rect.width * scale);
+  canvas.height = Math.round(rect.height * scale);
+  const ctx = canvas.getContext("2d");
+  ctx.scale(scale, scale);
+  ctx.fillStyle = "#dddddd";
+  ctx.fillRect(0, 0, rect.width, rect.height);
+
+  const drawElement = (el) => {
+    const r = el.getBoundingClientRect();
+    ctx.drawImage(el, r.left - rect.left, r.top - rect.top, r.width, r.height);
+  };
+
+  for (const tile of container.querySelectorAll("img.leaflet-tile")) {
+    if (tile.complete && tile.naturalWidth > 0) drawElement(tile);
+  }
+  for (const overlay of container.querySelectorAll("img.leaflet-image-layer")) {
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    drawElement(overlay);
+    ctx.restore();
+  }
+
+  // Markørerne tegnes direkte i stedet for at rastere Leaflets SVG pane,
+  // som placeres upræcist ved serialisering.
+  for (const school of SCHOOLS) {
+    if (!visible.has(school.id)) continue;
+    const p = map.latLngToContainerPoint([school.lat, school.lng]);
+    const style = markerStyle(school);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, style.radius, 0, 2 * Math.PI);
+    ctx.fillStyle = style.fillColor;
+    ctx.globalAlpha = style.fillOpacity;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = style.weight;
+    ctx.strokeStyle = style.color;
+    ctx.stroke();
+  }
+
+  drawInfoBox(ctx, rect.width);
+  return canvas;
+}
+
+function exportImage() {
+  const btn = document.getElementById("export-btn");
+  btn.disabled = true;
+  try {
+    const canvas = buildExportCanvas();
+    canvas.toBlob((blob) => {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "ordblindeefterskoler-kort.png";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+      btn.disabled = false;
+    }, "image/png");
+  } catch (err) {
+    btn.disabled = false;
+    console.error(err);
+    alert("Kortet kunne ikke gemmes som billede i denne browser. Tag i stedet et screenshot.");
+  }
+}
+
+document.getElementById("export-btn").addEventListener("click", exportImage);
 
 /* Delbar visning: fravalgte skoler og afstandslagets tilstand ligger i
    URL hashen, fx #uden=emmerske,store-andst&afstand=1, så et scenarie

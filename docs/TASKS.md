@@ -137,6 +137,20 @@ Mål: alle ordblindeefterskoler på et Danmarkskort, hver skole kan slås til og
 
 **Resultat:** Panelet dækkede to tredjedele af mobilskærmen fra start og skjulte kortet, især uheldigt for delte scenarielinks. Nu starter det lukket på små skærme. Skolelisten i panelet er den tilgængelige tekstrepræsentation af kortindholdet.
 
+## Task 009: Nøgletal, scenarieknapper og billedeksport
+
+**Status:** DONE
+
+**Formål:** Gøre kortet præsentations- og presseklart, PRD F5 til F7.
+
+**Acceptkriterier:**
+
+- [x] arealandel over 75 km, i køretid 90 min, vises og opdateres ved toggles
+- [x] scenarieknapper med aktiv markering, ét klik sætter skolevalg og tænder laget
+- [x] PNG eksport med kort, lag, markører, infoboks, nøgletal, legend og OSM kreditering
+
+**Resultat:** Tærsklen 75 km valgt fordi den flytter sig mest i scenarierne, 1,8 % i dag mod 6,5 % uden Emmerske og Store Andst. Eksporten tegner markører direkte i canvas, da SVG serialisering placerede dem upræcist, justering verificeret med pixelprøver. Tiles kræver CORS, sat på tileLayer.
+
 ## Opdagede tasks
 
 Ingen åbne.

@@ -59,10 +59,10 @@ Mangler:
 
 Ikke del af nuværende scope, prioriteret efter værdi for kommunikationsformålet:
 
-1. citerbart nøgletal: en talboks der viser hvor stor en andel af Danmark der med det aktuelle valg har over fx 100 km eller 90 min til nærmeste skole. Første version med arealandel, kræver ingen eksterne data. Stærkere version vægtet med befolkningstal fra Danmarks Statistiks 1 km kvadratnet
+1. citerbart nøgletal med arealandel: DONE, se PRD F5. Stærkere version vægtet med befolkningstal fra Danmarks Statistiks 1 km kvadratnet er stadig åben
 2. kapacitet og venteliste pr. skole i popup og liste, gør Store Andst argumentet konkret, data skal skaffes fra skolerne
-3. scenarieknapper: forudindstillede valg som "I dag", "Uden Emmerske", "Uden Emmerske og Store Andst", så en præsentation er ét klik
-4. eksport af kortudsnit som billede til presse og sociale medier
+3. scenarieknapper: DONE, se PRD F6
+4. eksport af kortudsnit som billede: DONE, se PRD F7
 5. adressesøgning, "hvor langt er der fra jeres adresse", via DAWA
 6. embed venlig visning til nyhedsmedier
 7. andre specialefterskoletyper som ekstra lag

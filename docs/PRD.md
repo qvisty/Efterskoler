@@ -115,6 +115,33 @@ Acceptkriterier:
 - [x] et delt link åbner direkte i scenariet
 - [x] standardvisningen har en ren URL
 
+#### F5. Citerbart nøgletal
+
+Når afstandslaget er tændt, vises andelen af Danmarks areal med over 75 km i luftlinje, i køretidstilstand over 90 min, til nærmeste valgte skole. Tallet opdateres ved hver toggle.
+
+Acceptkriterier:
+
+- [x] nøgletallet opdateres når skoler slås til og fra
+- [x] tærsklen følger en intervalgrænse i legenden
+
+#### F6. Scenarieknapper
+
+Faste knapper: I dag, Uden Emmerske, Uden Emmerske og Store Andst. Ét klik sætter skolevalget og tænder afstandslaget. Den aktive knap fremhæves.
+
+Acceptkriterier:
+
+- [x] ét klik pr. scenarie, aktiv markering følger med
+- [x] manuelt toggle fjerner markeringen når valget afviger
+
+#### F7. Eksport som billede
+
+Knappen Gem kortet som billede downloader den aktuelle visning som PNG med infoboks, nøgletal, legend og OpenStreetMap kreditering.
+
+Acceptkriterier:
+
+- [x] PNG med kort, farvelag, markører og infoboks
+- [x] OpenStreetMap attribution er med i billedet
+
 ### Should have
 
 - reel kørselstid i stedet for luftlinje, precomputed, se roadmap fase 2

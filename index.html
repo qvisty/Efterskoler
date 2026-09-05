@@ -87,6 +87,72 @@
       white-space: nowrap;
     }
 
+    #scenarios {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #e3e6ea;
+    }
+
+    #scenarios button {
+      border: 1px solid #c6ccd4;
+      background: #f4f6f8;
+      border-radius: 999px;
+      padding: 4px 11px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    #scenarios button:hover { background: #e8ebef; }
+
+    #scenarios button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    #stat {
+      margin-top: 10px;
+      padding: 9px 11px;
+      background: #fdf1ec;
+      border: 1px solid #f3cebd;
+      border-radius: 8px;
+      line-height: 1.35;
+    }
+
+    #stat-value {
+      display: block;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    #stat-label {
+      font-size: 0.78rem;
+      color: #5a6270;
+    }
+
+    #export-row {
+      padding: 10px 16px;
+      border-top: 1px solid #e3e6ea;
+    }
+
+    #export-row button {
+      width: 100%;
+      border: 1px solid #c6ccd4;
+      background: #f4f6f8;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    #export-row button:hover { background: #e8ebef; }
+    #export-row button:disabled { opacity: 0.5; cursor: wait; }
+
     #distance-section {
       padding: 8px 16px 10px;
       border-bottom: 1px solid #e3e6ea;
@@ -244,14 +310,22 @@
       <button id="select-none" type="button">Fravælg alle</button>
       <span id="count" aria-live="polite"></span>
     </div>
+    <div id="scenarios"></div>
     <div id="distance-section">
       <label id="distance-toggle-row">
         <input type="checkbox" id="distance-toggle">
         <span>Farvelæg efter afstand til nærmeste synlige skole</span>
       </label>
+      <div id="stat" hidden>
+        <span id="stat-value"></span>
+        <span id="stat-label"></span>
+      </div>
       <div id="legend" hidden></div>
     </div>
     <div id="school-list"></div>
+    <div id="export-row">
+      <button id="export-btn" type="button">Gem kortet som billede</button>
+    </div>
   </aside>
 
   <script src="vendor/leaflet/leaflet.js"></script>
