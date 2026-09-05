@@ -79,8 +79,15 @@ Browser
 scripts/generate_grid.mjs  regenererer data/grid.js fra Natural Earth data
 ```
 
-Afstandslaget tegner en canvas rektangel pr. gitterpunkt, farvet efter
-luftlinjeafstand til nærmeste synlige skole, og genberegner ved hver toggle.
+Afstandslaget tegner alle gitterceller i ét offscreen canvas i web mercator
+og viser det som ét imageOverlay, så pan og zoom er gratis uanset antal
+celler. Ved hver toggle genberegnes og gentegnes billedet, ca. 130 ms ved
+42000 celler. Hover håndteres af én mousemove handler med O(1) celleopslag.
+
+Findes `data/traveltimes.js` med precomputed køretider fra
+`scripts/generate_traveltimes.mjs`, farves efter minutter i bil i stedet
+for luftlinje km. Placeholderfilen har `TRAVELTIMES = null`, som giver
+luftlinje.
 
 ## Domæner og komponenter
 

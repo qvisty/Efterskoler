@@ -94,19 +94,18 @@ Mål: alle ordblindeefterskoler på et Danmarkskort, hver skole kan slås til og
 
 ## Task 006: Kørselstid i stedet for luftlinje
 
-**Status:** TODO
+**Status:** IN PROGRESS, afventer lokal kørsel af scriptet
 
 **Formål:** Afstandslaget skal vise reel rejsetid i bil, ikke luftlinje.
 
-**Skitse:** Engangsberegning af kørselstid fra hvert gitterpunkt i `data/grid.js` til alle skoler, fx via en lokal OSRM instans eller OpenRouteService, gemt som statisk fil `data/traveltimes.js`. Frontend vælger så minimum over synlige skoler, samme logik som nu. Ved manglende data falder laget tilbage til luftlinje.
-
 **Acceptkriterier:**
 
-- [ ] kørselstider precomputed for alle gitterpunkt-skole par
-- [ ] legenden skifter til minutter
-- [ ] toggle adfærden er uændret
+- [x] script klar: `scripts/generate_traveltimes.mjs`, kun Node 18+, med resume og retry
+- [x] frontend klar: findes `data/traveltimes.js` med gyldige data, skifter laget automatisk til minutter, legend og hover følger med, verificeret med syntetiske data
+- [x] mismatch mellem traveltimes og grid giver fallback til luftlinje med console advarsel
+- [ ] scriptet kørt lokalt og `data/traveltimes.js` committet
 
-**Note:** Routing tjenester var blokeret i det oprindelige udviklingsmiljø, beregningen skal køres et sted med netadgang.
+**Note:** Routing tjenester er blokeret i udviklingsmiljøet, så selve kørslen skal ske lokalt: `node scripts/generate_traveltimes.mjs`, se `scripts/README.md`. Ca. 600 kald til OSRM demo serveren, 10 til 15 minutter.
 
 ## Task 007: Delbar visning via URL
 

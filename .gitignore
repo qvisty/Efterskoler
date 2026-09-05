@@ -32,6 +32,11 @@ staticfiles/
 # Node
 node_modules/
 dist/
+package.json
+package-lock.json
+
+# Fremdrift fra generate_traveltimes.mjs
+scripts/.traveltimes_progress.json
 
 # Coverage
 .coverage

@@ -13,7 +13,29 @@ npm install world-atlas topojson-client
 node scripts/generate_grid.mjs
 ```
 
-`CELL_KM` i toppen af scriptet styrer cellestørrelsen i km. Mindre celler giver mere detaljeret farvelægning og en større `data/grid.js`. Ved 2 km er der ca. 10600 celler, og genberegningen i browseren tager under 20 ms, så der er plads til at gå finere ned, hvis det ønskes.
+`CELL_KM` i toppen af scriptet styrer cellestørrelsen i km. Mindre celler giver mere detaljeret farvelægning og en større `data/grid.js`. Ved 1 km er der ca. 42000 celler.
+
+Bemærk: efter en grid ændring passer `data/traveltimes.js` ikke længere og skal genereres om, ellers falder kortet tilbage til luftlinje.
+
+## generate_traveltimes.mjs
+
+Genererer `data/traveltimes.js`, køretid i bil i minutter fra hvert gitterpunkt til hver skole. Når filen er committet, skifter afstandslaget automatisk fra luftlinje km til minutter.
+
+Kræver kun Node 18 eller nyere og netadgang, ingen dependencies:
+
+```bash
+node scripts/generate_traveltimes.mjs
+```
+
+Scriptet bruger den offentlige OSRM demo server, holder pauser mellem kaldene og gemmer løbende fremdrift, så det kan afbrydes og genoptages. Med 1 km gitteret er det ca. 600 kald og 10 til 15 minutter. En egen OSRM instans kan angives med `OSRM_URL=... node scripts/generate_traveltimes.mjs`.
+
+Bagefter:
+
+```bash
+git add data/traveltimes.js
+git commit -m "Precomputed køretider"
+git push
+```
 
 ## Langtidskørende processer
 

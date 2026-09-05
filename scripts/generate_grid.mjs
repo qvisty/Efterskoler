@@ -15,7 +15,7 @@ const require = createRequire(import.meta.url);
 const topo = require("world-atlas/countries-10m.json");
 const tc = require("topojson-client");
 
-const CELL_KM = 2;
+const CELL_KM = 1;
 
 const geo = tc.feature(topo, topo.objects.countries);
 const denmark = geo.features.find((f) => f.properties.name === "Denmark");

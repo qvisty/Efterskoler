@@ -51,15 +51,44 @@ for (const school of SCHOOLS) {
 }
 
 /* Afstandslag: gitterceller over Danmarks landareal, farvet efter afstand
-   i luftlinje til nærmeste synlige skole. Gitteret kommer fra data/grid.js. */
+   til nærmeste synlige skole. Gitteret kommer fra data/grid.js og tegnes
+   som ét samlet canvas billede i et imageOverlay, så titusindvis af celler
+   ikke koster noget ved pan og zoom.
 
-const DISTANCE_BINS = [
-  { max: 25, color: "#fee5d9" },
-  { max: 50, color: "#fcae91" },
-  { max: 75, color: "#fb6a4a" },
-  { max: 100, color: "#de2d26" },
-  { max: Infinity, color: "#a50f15" },
+   Findes data/traveltimes.js med precomputed køretider (Task 006), bruges
+   minutter i bil i stedet for luftlinje km. */
+
+const KM_BINS = [
+  { max: 25, color: "#fee5d9", label: "under 25 km" },
+  { max: 50, color: "#fcae91", label: "25 til 50 km" },
+  { max: 75, color: "#fb6a4a", label: "50 til 75 km" },
+  { max: 100, color: "#de2d26", label: "75 til 100 km" },
+  { max: Infinity, color: "#a50f15", label: "over 100 km" },
 ];
+
+const MIN_BINS = [
+  { max: 30, color: "#fee5d9", label: "under 30 min" },
+  { max: 60, color: "#fcae91", label: "30 til 60 min" },
+  { max: 90, color: "#fb6a4a", label: "60 til 90 min" },
+  { max: 120, color: "#de2d26", label: "90 til 120 min" },
+  { max: Infinity, color: "#a50f15", label: "over 120 min" },
+];
+
+const travelMode =
+  typeof TRAVELTIMES !== "undefined" &&
+  TRAVELTIMES !== null &&
+  Array.isArray(TRAVELTIMES.minutes) &&
+  TRAVELTIMES.minutes.length === GRID.points.length;
+
+if (typeof TRAVELTIMES !== "undefined" && TRAVELTIMES !== null && !travelMode) {
+  console.warn("traveltimes.js matcher ikke grid.js, falder tilbage til luftlinje. Kør scripts/generate_traveltimes.mjs igen.");
+}
+
+const BINS = travelMode ? MIN_BINS : KM_BINS;
+// Kolonneindeks pr. skole i TRAVELTIMES rækkerne.
+const travelCol = travelMode
+  ? new Map(TRAVELTIMES.schoolIds.map((id, i) => [id, i]))
+  : null;
 
 function haversineKm(lat1, lng1, lat2, lng2) {
   const rad = Math.PI / 180;
@@ -71,71 +100,170 @@ function haversineKm(lat1, lng1, lat2, lng2) {
   return 6371 * 2 * Math.asin(Math.sqrt(a));
 }
 
-function binColor(km) {
-  for (const bin of DISTANCE_BINS) {
-    if (km < bin.max) return bin.color;
+function binColor(value) {
+  for (const bin of BINS) {
+    if (value < bin.max) return bin.color;
   }
-  return DISTANCE_BINS[DISTANCE_BINS.length - 1].color;
+  return BINS[BINS.length - 1].color;
 }
+
+// Geometri for gitteret og canvas i web mercator y, så billedet ligger
+// præcist når Leaflet strækker det mellem hjørnerne.
+const grid = (() => {
+  let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
+  for (const [lat, lng] of GRID.points) {
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+    if (lng < minLng) minLng = lng;
+    if (lng > maxLng) maxLng = lng;
+  }
+  minLat -= GRID.latStep / 2;
+  maxLat += GRID.latStep / 2;
+  minLng -= GRID.lngStep / 2;
+  maxLng += GRID.lngStep / 2;
+  const cols = Math.round((maxLng - minLng) / GRID.lngStep);
+  const rows = Math.round((maxLat - minLat) / GRID.latStep);
+  // Opslag fra cellekoordinat til punktindeks, bruges af hover.
+  const index = new Map();
+  GRID.points.forEach(([lat, lng], i) => {
+    const c = Math.floor((lng - minLng) / GRID.lngStep);
+    const r = Math.floor((lat - minLat) / GRID.latStep);
+    index.set(r * cols + c, i);
+  });
+  return { minLat, maxLat, minLng, maxLng, cols, rows, index };
+})();
+
+function mercY(lat) {
+  return Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
+}
+
+const CANVAS_SCALE = 2;
+const distanceCanvas = document.createElement("canvas");
+distanceCanvas.width = grid.cols * CANVAS_SCALE;
+distanceCanvas.height = grid.rows * CANVAS_SCALE;
+const distanceCtx = distanceCanvas.getContext("2d");
+const mercTop = mercY(grid.maxLat);
+const mercRange = mercTop - mercY(grid.minLat);
+const lngRange = grid.maxLng - grid.minLng;
 
 map.createPane("distancePane");
 map.getPane("distancePane").style.zIndex = 350;
-const distanceRenderer = L.canvas({ pane: "distancePane" });
-const distanceLayer = L.layerGroup();
-const distanceCells = [];
+const distanceOverlay = L.imageOverlay(
+  distanceCanvas.toDataURL(),
+  [
+    [grid.minLat, grid.minLng],
+    [grid.maxLat, grid.maxLng],
+  ],
+  { opacity: 0.55, pane: "distancePane", interactive: false }
+);
 let distanceLayerOn = false;
 
-for (const [lat, lng] of GRID.points) {
-  const cell = L.rectangle(
-    [
-      [lat - GRID.latStep / 2, lng - GRID.lngStep / 2],
-      [lat + GRID.latStep / 2, lng + GRID.lngStep / 2],
-    ],
-    {
-      renderer: distanceRenderer,
-      pane: "distancePane",
-      stroke: false,
-      fillColor: DISTANCE_BINS[0].color,
-      fillOpacity: 0.55,
+// Værdi for ét gitterpunkt: minutter i bil eller km i luftlinje, samt
+// hvilken synlig skole der er nærmest.
+function valueAt(pointIndex, active) {
+  let min = Infinity;
+  let nearest = null;
+  const [lat, lng] = GRID.points[pointIndex];
+  for (const s of active) {
+    let v;
+    if (travelMode) {
+      v = TRAVELTIMES.minutes[pointIndex][travelCol.get(s.id)];
+      if (v === null || v === undefined) continue;
+    } else {
+      v = haversineKm(lat, lng, s.lat, s.lng);
     }
-  );
-  cell.bindTooltip(() => cell._distanceText, { sticky: true, direction: "top" });
-  distanceCells.push({ lat, lng, cell });
-  distanceLayer.addLayer(cell);
+    if (v < min) {
+      min = v;
+      nearest = s;
+    }
+  }
+  return { min, nearest };
+}
+
+function redrawDistanceCanvas() {
+  const W = distanceCanvas.width;
+  const H = distanceCanvas.height;
+  const ctx = distanceCtx;
+  ctx.clearRect(0, 0, W, H);
+  const active = SCHOOLS.filter((s) => visible.has(s.id));
+  const halfLat = GRID.latStep / 2;
+  const halfLng = GRID.lngStep / 2;
+  for (let i = 0; i < GRID.points.length; i++) {
+    const [lat, lng] = GRID.points[i];
+    const { min } = active.length ? valueAt(i, active) : { min: Infinity };
+    ctx.fillStyle = binColor(min);
+    const x = ((lng - halfLng - grid.minLng) / lngRange) * W;
+    const w = (GRID.lngStep / lngRange) * W;
+    const yTop = ((mercTop - mercY(lat + halfLat)) / mercRange) * H;
+    const yBot = ((mercTop - mercY(lat - halfLat)) / mercRange) * H;
+    // Lille overlap så der ikke opstår hairlines mellem cellerne.
+    ctx.fillRect(x, yTop, w + 0.5, yBot - yTop + 0.5);
+  }
+  distanceOverlay.setUrl(distanceCanvas.toDataURL());
 }
 
 function updateDistanceLayer() {
   if (!distanceLayerOn) return;
-  const active = SCHOOLS.filter((s) => visible.has(s.id));
-  for (const { lat, lng, cell } of distanceCells) {
-    if (active.length === 0) {
-      cell.setStyle({ fillColor: binColor(Infinity) });
-      cell._distanceText = "Ingen skoler valgt";
-      continue;
-    }
-    let min = Infinity;
-    let nearest = null;
-    for (const s of active) {
-      const d = haversineKm(lat, lng, s.lat, s.lng);
-      if (d < min) {
-        min = d;
-        nearest = s;
-      }
-    }
-    cell.setStyle({ fillColor: binColor(min) });
-    cell._distanceText = `${Math.round(min)} km i luftlinje til ${nearest.name}`;
-  }
+  redrawDistanceCanvas();
 }
 
+// Hover: én tooltip der følger musen over landceller.
+const hoverTip = L.tooltip({ direction: "top", offset: [0, -8] });
+
+function hoverText(latlng) {
+  const c = Math.floor((latlng.lng - grid.minLng) / GRID.lngStep);
+  const r = Math.floor((latlng.lat - grid.minLat) / GRID.latStep);
+  const pointIndex = grid.index.get(r * grid.cols + c);
+  if (pointIndex === undefined) return null;
+  const active = SCHOOLS.filter((s) => visible.has(s.id));
+  if (active.length === 0) return "Ingen skoler valgt";
+  const { min, nearest } = valueAt(pointIndex, active);
+  if (!nearest) return "Ingen rute fundet";
+  return travelMode
+    ? `${Math.round(min)} min i bil til ${nearest.name}`
+    : `${Math.round(haversineKm(latlng.lat, latlng.lng, nearest.lat, nearest.lng))} km i luftlinje til ${nearest.name}`;
+}
+
+map.on("mousemove", (e) => {
+  if (!distanceLayerOn) return;
+  const text = hoverText(e.latlng);
+  if (!text) {
+    map.closeTooltip(hoverTip);
+    return;
+  }
+  hoverTip.setLatLng(e.latlng).setContent(text);
+  if (!map.hasLayer(hoverTip)) map.openTooltip(hoverTip);
+});
+
+map.on("mouseout", () => map.closeTooltip(hoverTip));
+
+// Legend bygges ud fra de aktive intervaller.
 const legendEl = document.getElementById("legend");
+for (const bin of BINS) {
+  const row = document.createElement("div");
+  row.className = "legend-row";
+  const swatch = document.createElement("span");
+  swatch.className = "swatch";
+  swatch.style.background = bin.color;
+  row.append(swatch, bin.label);
+  legendEl.appendChild(row);
+}
+const note = document.createElement("p");
+note.className = "legend-note";
+note.textContent = travelMode
+  ? "Køretid i bil, beregnet på forhånd med OSRM."
+  : "Afstand i luftlinje. Kørselsafstand er typisk 20 til 40 procent længere.";
+legendEl.appendChild(note);
+
 document.getElementById("distance-toggle").addEventListener("change", (e) => {
   distanceLayerOn = e.target.checked;
   legendEl.hidden = !distanceLayerOn;
   if (distanceLayerOn) {
-    updateDistanceLayer();
-    distanceLayer.addTo(map);
+    redrawDistanceCanvas();
+    distanceOverlay.addTo(map);
   } else {
-    map.removeLayer(distanceLayer);
+    map.removeLayer(distanceOverlay);
+    map.closeTooltip(hoverTip);
   }
   updateHash();
 });
