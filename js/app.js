@@ -233,9 +233,16 @@ function redrawDistanceCanvas() {
   distanceOverlay.setUrl(distanceCanvas.toDataURL());
 }
 
+// Gentegninger samles pr. frame, så fx vælg alle med 20 setVisible kald
+// kun koster én gentegning og skoletoggles føles øjeblikkelige.
+let redrawQueued = false;
 function updateDistanceLayer() {
-  if (!distanceLayerOn) return;
-  redrawDistanceCanvas();
+  if (!distanceLayerOn || redrawQueued) return;
+  redrawQueued = true;
+  requestAnimationFrame(() => {
+    redrawQueued = false;
+    if (distanceLayerOn) redrawDistanceCanvas();
+  });
 }
 
 // Hover: én tooltip der følger musen over landceller.
@@ -388,11 +395,6 @@ function applyScenario(scenario) {
   const uden = new Set(scenario.uden);
   for (const school of SCHOOLS) {
     setVisible(school, !uden.has(school.id));
-  }
-  const toggle = document.getElementById("distance-toggle");
-  if (!toggle.checked) {
-    toggle.checked = true;
-    toggle.dispatchEvent(new Event("change"));
   }
 }
 

@@ -126,12 +126,14 @@ Acceptkriterier:
 
 #### F6. Scenarieknapper
 
-Faste knapper: I dag, Uden Emmerske, Uden Emmerske og Store Andst. Ét klik sætter skolevalget og tænder afstandslaget. Den aktive knap fremhæves.
+Faste knapper: I dag, Uden Emmerske, Uden Emmerske og Store Andst. Ét klik sætter skolevalget. Den aktive knap fremhæves. Farvelaget styres udelukkende af sin egen toggle og genfarves live ved alle ændringer i skolevalget.
 
 Acceptkriterier:
 
 - [x] ét klik pr. scenarie, aktiv markering følger med
 - [x] manuelt toggle fjerner markeringen når valget afviger
+- [x] scenarieknapper og skoletoggles rører aldrig farvelagets tænd og sluk
+- [x] laget genfarves live, også vælg alle og fravælg alle sker i én gentegning
 
 #### F7. Eksport som billede
 
