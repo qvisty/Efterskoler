@@ -229,7 +229,7 @@
 <body>
   <div id="map"></div>
 
-  <button id="toggle-panel" type="button">Skoleliste</button>
+  <button id="toggle-panel" type="button" aria-controls="panel" aria-expanded="true">Skoleliste</button>
 
   <aside id="panel">
     <header>
@@ -242,7 +242,7 @@
     <div id="controls">
       <button id="select-all" type="button">Vælg alle</button>
       <button id="select-none" type="button">Fravælg alle</button>
-      <span id="count"></span>
+      <span id="count" aria-live="polite"></span>
     </div>
     <div id="distance-section">
       <label id="distance-toggle-row">

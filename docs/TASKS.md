@@ -122,6 +122,21 @@ Mål: alle ordblindeefterskoler på et Danmarkskort, hver skole kan slås til og
 
 **Resultat:** Format `#uden=emmerske,store-andst&afstand=1`. Standardvisningen har ingen hash. Verificeret med Playwright.
 
+## Task 008: Mobilvisning og tilgængelighed
+
+**Status:** DONE
+
+**Formål:** Roadmap fase 3 gennemgang af kortet på små skærme og grundlæggende tilgængelighed.
+
+**Acceptkriterier:**
+
+- [x] mobil gennemgået på 375 px bredde med Playwright screenshots
+- [x] panelet starter sammenklappet på små skærme, kortet ses først
+- [x] panelknappen har aria-expanded og aria-controls
+- [x] tælleren annonceres via aria-live
+
+**Resultat:** Panelet dækkede to tredjedele af mobilskærmen fra start og skjulte kortet, især uheldigt for delte scenarielinks. Nu starter det lukket på små skærme. Skolelisten i panelet er den tilgængelige tekstrepræsentation af kortindholdet.
+
 ## Opdagede tasks
 
 Ingen åbne.

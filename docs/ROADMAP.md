@@ -53,7 +53,7 @@ Mangler:
 
 - GitHub Pages hosting: DONE, https://qvisty.github.io/Efterskoler/
 - delbar visning via URL parametre: DONE
-- gennemgang af mobilvisning og tilgængelighed: TODO
+- gennemgang af mobilvisning og tilgængelighed: DONE
 
 ## Senere muligheder
 

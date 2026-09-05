@@ -337,9 +337,22 @@ document.getElementById("select-none").addEventListener("click", () => {
 });
 
 const panel = document.getElementById("panel");
-document.getElementById("toggle-panel").addEventListener("click", () => {
-  panel.classList.toggle("hidden");
+const panelToggle = document.getElementById("toggle-panel");
+
+function setPanelOpen(open) {
+  panel.classList.toggle("hidden", !open);
+  panelToggle.setAttribute("aria-expanded", String(open));
+}
+
+panelToggle.addEventListener("click", () => {
+  setPanelOpen(panel.classList.contains("hidden"));
 });
+
+// På små skærme er kortet det vigtigste, panelet starter sammenklappet
+// og er ét tryk væk.
+if (window.matchMedia("(max-width: 640px)").matches) {
+  setPanelOpen(false);
+}
 
 /* Delbar visning: fravalgte skoler og afstandslagets tilstand ligger i
    URL hashen, fx #uden=emmerske,store-andst&afstand=1, så et scenarie
