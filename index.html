@@ -113,12 +113,20 @@
       color: #fff;
     }
 
+    #map-info {
+      position: absolute;
+      right: 12px;
+      bottom: 28px;
+      z-index: 900;
+      width: 235px;
+      background: var(--panel-bg);
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+      padding: 10px 13px 9px;
+    }
+
     #stat {
-      margin-top: 10px;
-      padding: 9px 11px;
-      background: #fdf1ec;
-      border: 1px solid #f3cebd;
-      border-radius: 8px;
+      margin-bottom: 8px;
       line-height: 1.35;
     }
 
@@ -177,7 +185,6 @@
     }
 
     #legend {
-      margin-top: 8px;
       font-size: 0.78rem;
       color: #454c58;
     }
@@ -282,6 +289,12 @@
     @media (max-width: 640px) {
       #toggle-panel { display: block; }
 
+      #map-info {
+        right: 10px;
+        bottom: 24px;
+        width: 205px;
+      }
+
       #panel {
         top: 56px;
         width: calc(100% - 24px);
@@ -294,6 +307,14 @@
 </head>
 <body>
   <div id="map"></div>
+
+  <div id="map-info" hidden>
+    <div id="stat">
+      <span id="stat-value"></span>
+      <span id="stat-label"></span>
+    </div>
+    <div id="legend"></div>
+  </div>
 
   <button id="toggle-panel" type="button" aria-controls="panel" aria-expanded="true">Skoleliste</button>
 
@@ -316,11 +337,6 @@
         <input type="checkbox" id="distance-toggle">
         <span>Farvelæg efter afstand til nærmeste synlige skole</span>
       </label>
-      <div id="stat" hidden>
-        <span id="stat-value"></span>
-        <span id="stat-label"></span>
-      </div>
-      <div id="legend" hidden></div>
     </div>
     <div id="school-list"></div>
     <div id="export-row">

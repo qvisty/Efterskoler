@@ -4,7 +4,7 @@
 const REGION_ORDER = ["Nordjylland", "Midtjylland", "Syddanmark", "Fyn og øerne", "Sjælland"];
 
 const map = L.map("map", { zoomControl: false });
-L.control.zoom({ position: "bottomright" }).addTo(map);
+L.control.zoom({ position: "topright" }).addTo(map);
 
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 18,
@@ -293,10 +293,10 @@ note.textContent = travelMode
   : "Afstand i luftlinje. Kørselsafstand er typisk 20 til 40 procent længere.";
 legendEl.appendChild(note);
 
+const mapInfoEl = document.getElementById("map-info");
 document.getElementById("distance-toggle").addEventListener("change", (e) => {
   distanceLayerOn = e.target.checked;
-  legendEl.hidden = !distanceLayerOn;
-  statEl.hidden = !distanceLayerOn;
+  mapInfoEl.hidden = !distanceLayerOn;
   if (distanceLayerOn) {
     redrawDistanceCanvas();
     distanceOverlay.addTo(map);

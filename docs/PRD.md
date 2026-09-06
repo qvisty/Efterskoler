@@ -117,7 +117,7 @@ Acceptkriterier:
 
 #### F5. Citerbart nøgletal
 
-Når afstandslaget er tændt, vises andelen af Danmarks areal med over 75 km i luftlinje, i køretidstilstand over 90 min, til nærmeste valgte skole. Tallet opdateres ved hver toggle.
+Når afstandslaget er tændt, vises andelen af Danmarks areal med over 75 km i luftlinje, i køretidstilstand over 90 min, til nærmeste valgte skole. Tallet opdateres ved hver toggle. Nøgletal og legend ligger i en boks nederst til højre på selve kortet, så skolelisten i panelet beholder sin fulde højde, mens kortet er farvelagt.
 
 Acceptkriterier:
 
