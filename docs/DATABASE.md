@@ -46,6 +46,8 @@ region      landsdel til gruppering i panelet
 lat, lng    WGS84 koordinater
 website     skolens hjemmeside
 highlight   true for Emmerske Efterskole
+defaultOff  true for skoler der starter slået fra, fx lukkede skoler
+note        kort note der vises i liste og popup, fx "Lukket sommeren 2026"
 ```
 
 Derudover indeholder `data/grid.js` de genererede gitterpunkter til afstandslaget, se `docs/ARCHITECTURE.md`.

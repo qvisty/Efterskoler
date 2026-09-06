@@ -181,6 +181,9 @@ const SCHOOLS = [
     lng: 11.3585,
     website: "https://efterskolensolbakken.dk",
     highlight: false,
+    // Lukkede sommeren 2026, vises derfor slået fra som standard.
+    defaultOff: true,
+    note: "Lukket sommeren 2026",
   },
   {
     id: "hjembaek",

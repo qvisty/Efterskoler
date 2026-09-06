@@ -36,9 +36,11 @@ function markerStyle(school) {
 }
 
 function popupHtml(school) {
+  const note = school.note ? `<div class="popup-town"><strong>${school.note}</strong></div>` : "";
   return (
     `<strong>${school.name}</strong>` +
     `<div class="popup-town">${school.town}</div>` +
+    note +
     `<a href="${school.website}" target="_blank" rel="noopener">${school.website.replace(/^https?:\/\//, "")}</a>`
   );
 }
@@ -359,7 +361,8 @@ for (const region of REGION_ORDER) {
     dot.className = "dot";
 
     const text = document.createElement("span");
-    text.innerHTML = `${school.name}<span class="town">${school.town}</span>`;
+    const noteText = school.note ? ` · ${school.note}` : "";
+    text.innerHTML = `${school.name}<span class="town">${school.town}${noteText}</span>`;
 
     row.append(box, dot, text);
     listEl.appendChild(row);
@@ -371,13 +374,17 @@ updateCount();
 /* Scenarieknapper: faste valg til præsentation, ét klik sætter
    skolevalget og tænder afstandslaget. */
 
+// Skoler der er slået fra som standard, fx lukkede skoler. Indgår også
+// i alle scenarier, "I dag" betyder de skoler der reelt er åbne.
+const DEFAULT_OFF = SCHOOLS.filter((s) => s.defaultOff).map((s) => s.id);
+
 const SCENARIOS = [
-  { id: "idag", label: "I dag", uden: [] },
-  { id: "uden-emmerske", label: "Uden Emmerske", uden: ["emmerske"] },
+  { id: "idag", label: "I dag", uden: [...DEFAULT_OFF] },
+  { id: "uden-emmerske", label: "Uden Emmerske", uden: [...DEFAULT_OFF, "emmerske"] },
   {
     id: "uden-emmerske-store-andst",
     label: "Uden Emmerske og Store Andst",
-    uden: ["emmerske", "store-andst"],
+    uden: [...DEFAULT_OFF, "emmerske", "store-andst"],
   },
 ];
 
@@ -623,7 +630,11 @@ function updateHash() {
 
 function applyHash() {
   const params = new URLSearchParams(location.hash.slice(1));
-  const uden = new Set((params.get("uden") || "").split(",").filter(Boolean));
+  // Uden hash startes med standardvalget, hvor fx lukkede skoler er
+  // slået fra. En hash er absolut og styrer hele skolevalget selv.
+  const uden = params.has("uden") || params.has("afstand")
+    ? new Set((params.get("uden") || "").split(",").filter(Boolean))
+    : new Set(DEFAULT_OFF);
   for (const school of SCHOOLS) {
     setVisible(school, !uden.has(school.id));
   }
