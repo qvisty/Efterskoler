@@ -1,0 +1,12 @@
+# Kun index.html, js/, data/, vendor/ og nginx.conf skal ind i imaget.
+# Dockerfilen kopierer selv præcis dem, så listen her sparer mest byggetid.
+.git
+.github
+.claude
+docs
+prompts
+scripts
+*.md
+.env
+.env.*
+node_modules
