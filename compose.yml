@@ -1,0 +1,27 @@
+# Kobler projektet på den delte Caddy på hjemmeserveren.
+# Kontrakten med serveren er: servicen hedder web, containeren hedder
+# <projektnavn>-web, den lytter på 8000, og den er på netværket web.
+# PROJECT_NAME kommer fra /srv/<projektnavn>/.env via deploy.sh.
+#
+# Ingen database, ingen volumes og ingen hemmeligheder. Sitet er statisk,
+# alt indhold ligger i imaget og kommer fra git.
+services:
+  web:
+    build: .
+    image: ${PROJECT_NAME}:seneste
+    container_name: ${PROJECT_NAME}-web
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Europe/Copenhagen}
+    networks:
+      - web
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8000/sundhed/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  web:
+    external: true

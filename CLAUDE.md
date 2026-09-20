@@ -317,6 +317,7 @@ Ingen build steps og ingen dependencies at installere.
 
 - Start lokalt: `python3 -m http.server` i projektroden og åbn `http://localhost:8000`. `index.html` kan også åbnes direkte i en browser.
 - Der er ingen automatiske tests. Verifikation sker ved at inspicere kortet i en browser, fx via Playwright screenshot.
+- Deploy til hjemmeserveren: `git push` og derefter `ssh server /srv/server/scripts/deploy.sh efterskoler`. Læs `docs/DRIFT.md` først.
 
 ## Arkitektur i denne kodebase
 
@@ -328,3 +329,7 @@ Statisk site uden backend og database. Interaktivt Leaflet kort over ordblindeef
 - `vendor/leaflet/`: Leaflet 1.9.4, vendoret, må ikke redigeres i hånden
 
 Korttiles hentes fra OpenStreetMap på runtime, alt andet er lokalt. Detaljer i `docs/ARCHITECTURE.md`.
+
+## Drift, hjemmeserveren
+
+Projektet hostes på Jespers hjemmeserver, ved siden af GitHub Pages. **Læs `docs/DRIFT.md` før du deployer, eller før du ændrer i `compose.yml`, `Dockerfile` eller `nginx.conf`.** Den beskriver vejen ud på serveren, de fire krav der ikke må brydes, og hvorfor der hverken er database eller hemmeligheder i dette projekt.

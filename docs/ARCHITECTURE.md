@@ -107,9 +107,37 @@ Første del er leveret som luftlinjelag beregnet i browseren. Opgradering til re
 
 ## Deployment
 
-- Platform: GitHub Pages, endnu ikke sat op
-- Build: ingen, filerne serveres som de er
+To kanaler serverer den samme kode fra dette repo.
+
+### GitHub Pages
+
+- Platform: GitHub Pages, workflow i `.github/workflows/pages.yml`, deployer ved push til main
+- Build: ingen, filerne serveres som de er, script referencer versionsstemples ved deploy
 - Secrets: ingen
+- Adgang: offentlig
+
+### Hjemmeserveren
+
+- Platform: Jespers hjemmeserver, drevet af repoet qvisty/Min-server, som er kilden til sandhed om opsætningen
+- Build: nginx image bygges på serveren med `Dockerfile` i repoets rod, ikke i GitHub Actions
+- Deploy flow: kode pushes til GitHub, derefter `ssh server /srv/server/scripts/deploy.sh efterskoler`, som henter koden, bygger og genstarter containeren. Migrationstrinnet springes over, projektet har ingen `manage.py`. Opsætning første gang sker med `new-project.sh efterskoler <git-url>` på serveren
+- Secrets: ingen. `new-project.sh` genererer en `.env` på serveren som del af sit faste flow, men projektet bruger kun `PROJECT_NAME`, `REPO_URL` og `TZ` derfra
+- Database: ingen. Den database, `new-project.sh` opretter i den delte Postgres, står ubrugt hen, samme mønster som et SQLite projekt, se `docs/kobling.md` i Min-server
+- Backups: ikke relevante, alt indhold ligger i git
+- Monitoring: Uptime Kuma kan overvåge `https://efterskoler.srv.mitcv.com/sundhed/`, som nginx svarer `ok` på
+- Rollback: `deploy.sh efterskoler <git-ref>`
+- Adgang: privat, kun Jespers egne enheder på Tailscale. Valgt bevidst, Pages udgaven er den offentlige
+
+Detaljerne står i `docs/DRIFT.md`.
+
+#### Kontrakten med serveren
+
+Projektet kan kun køre på serveren, hvis alle fire punkter holder:
+
+1. Repoets rod har en `compose.yml` med en service ved navn `web`
+2. Containeren hedder `efterskoler-web`
+3. Den lytter på port 8000
+4. Den er på det eksterne Docker netværk `web`
 
 ## Arkitekturbeslutninger
 

@@ -151,6 +151,21 @@ Mål: alle ordblindeefterskoler på et Danmarkskort, hver skole kan slås til og
 
 **Resultat:** Tærsklen 75 km valgt fordi den flytter sig mest i scenarierne, 1,8 % i dag mod 6,5 % uden Emmerske og Store Andst. Eksporten tegner markører direkte i canvas, da SVG serialisering placerede dem upræcist, justering verificeret med pixelprøver. Tiles kræver CORS, sat på tileLayer.
 
+## Task 010: Selvhosting på hjemmeserveren
+
+**Status:** REVIEW
+
+**Formål:** Afprøve Min-server flowet med et rigtigt projekt nummer to, ved siden af GitHub Pages.
+
+**Acceptkriterier:**
+
+- [x] `compose.yml`, `Dockerfile` og `nginx.conf` opfylder serverens kontrakt, service web, container efterskoler-web, port 8000, netværk web
+- [x] `/sundhed/` svarer ok, så deploy.sh og Uptime Kuma kan bruge den
+- [x] `docs/DRIFT.md` beskriver driften, og `CLAUDE.md` henviser til den
+- [ ] `new-project.sh` og `deploy.sh` er kørt på serveren, og `https://efterskoler.srv.mitcv.com` svarer fra en Tailscale maskine
+
+**Resultat:** Filerne er klar, adgang er valgt privat. Det sidste kriterium kan kun bevises fra Jespers egne maskiner, kommandoerne står i `docs/DRIFT.md`. Kræver Min-server rettelsen, der springer migrationstrinnet over for projekter uden manage.py.
+
 ## Opdagede tasks
 
 Ingen åbne.
